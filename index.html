@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategy Demo</title>
+</head>
+<body>
+    <h1>Sản phẩm ABC</h1>
+    <div id="reviews-section">
+        <div id="controls">
+            <button id="load-reviews-btn">Tải bình luận</button>
+        </div>
+        <div id="spinner" style="display: none;">Đang tải...</div>
+        <ul id="reviews-list"></ul>
+    </div>
+
+    <script>
+        const loadButton = document.getElementById('load-reviews-btn');
+        const spinner = document.getElementById('spinner');
+        const reviewsList = document.getElementById('reviews-list');
+        const controlsDiv = document.getElementById('controls');
+
+        loadButton.addEventListener('click', () => {
+            // 1. Thay đổi UI ngay lập tức
+            loadButton.disabled = true;
+            spinner.style.display = 'block';
+
+            // 2. Giả lập gọi API mất 3 giây
+            setTimeout(() => {
+                // 3. Cập nhật UI sau khi "API" trả về
+                const reviews = ['Bình luận tuyệt vời!', 'Sản phẩm rất tốt.', 'Sẽ mua lại.'];
+                
+                reviews.forEach(text => {
+                    const li = document.createElement('li');
+                    li.textContent = text;
+                    reviewsList.appendChild(li);
+                });
+
+                // Xóa spinner và nút bấm
+                spinner.style.display = 'none';
+                controlsDiv.innerHTML = '<p>Đã hiển thị tất cả bình luận.</p>';
+
+            }, 3000); // <-- Độ trễ 3 giây
+        });
+    </script>
+</body>
+</html>
