@@ -2,45 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Strategy Demo</title>
+    <title>Advanced Strategy Demo</title>
 </head>
 <body>
-    <h1>Sản phẩm ABC</h1>
-    <div id="reviews-section">
-        <div id="controls">
-            <button id="load-reviews-btn">Tải bình luận</button>
-        </div>
-        <div id="spinner" style="display: none;">Đang tải...</div>
-        <ul id="reviews-list"></ul>
+    <div id="feedback-form-container">
+        <h1>Gửi Phản Hồi</h1>
+        <form id="feedback-form">
+            <div>
+                <label for="name">Tên của bạn:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email">
+                <span id="email-status" style="margin-left: 10px;"></span>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="message">Nội dung:</label>
+                <textarea id="message" name="message"></textarea>
+            </div>
+            <div style="margin-top: 10px;">
+                <button type="submit" id="submit-btn" disabled>Gửi Phản Hồi</button>
+                <span id="submit-status" style="margin-left: 10px;"></span>
+            </div>
+        </form>
     </div>
 
     <script>
-        const loadButton = document.getElementById('load-reviews-btn');
-        const spinner = document.getElementById('spinner');
-        const reviewsList = document.getElementById('reviews-list');
-        const controlsDiv = document.getElementById('controls');
+        const formContainer = document.getElementById('feedback-form-container');
+        const form = document.getElementById('feedback-form');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const messageInput = document.getElementById('message');
+        const emailStatus = document.getElementById('email-status');
+        const submitButton = document.getElementById('submit-btn');
+        const submitStatus = document.getElementById('submit-status');
 
-        loadButton.addEventListener('click', () => {
-            // 1. Thay đổi UI ngay lập tức
-            loadButton.disabled = true;
-            spinner.style.display = 'block';
+        let isEmailValid = false;
 
-            // 2. Giả lập gọi API mất 3 giây
+        // Kích hoạt/Vô hiệu hóa nút Gửi dựa trên trạng thái form
+        function validateForm() {
+            const isFormFilled = nameInput.value && emailInput.value && messageInput.value;
+            submitButton.disabled = !isFormFilled || !isEmailValid;
+        }
+
+        nameInput.addEventListener('input', validateForm);
+        messageInput.addEventListener('input', validateForm);
+        emailInput.addEventListener('input', () => {
+            isEmailValid = false;
+            emailStatus.textContent = '';
+            validateForm();
+        });
+
+        // Giả lập xác thực email bất đồng bộ
+        emailInput.addEventListener('blur', () => {
+            if (!emailInput.value) return;
+            emailStatus.textContent = 'Đang kiểm tra...';
+            isEmailValid = false;
+
             setTimeout(() => {
-                // 3. Cập nhật UI sau khi "API" trả về
-                const reviews = ['Bình luận tuyệt vời!', 'Sản phẩm rất tốt.', 'Sẽ mua lại.'];
-                
-                reviews.forEach(text => {
-                    const li = document.createElement('li');
-                    li.textContent = text;
-                    reviewsList.appendChild(li);
-                });
+                if (emailInput.value.includes('@')) {
+                    emailStatus.textContent = '✅ Email hợp lệ';
+                    isEmailValid = true;
+                } else {
+                    emailStatus.textContent = '❌ Email không hợp lệ';
+                    isEmailValid = false;
+                }
+                validateForm();
+            }, 1500); // <-- Độ trễ 1.5 giây
+        });
+        
+        // Giả lập quá trình gửi form
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitButton.disabled = true;
+            submitStatus.textContent = 'Đang gửi...';
 
-                // Xóa spinner và nút bấm
-                spinner.style.display = 'none';
-                controlsDiv.innerHTML = '<p>Đã hiển thị tất cả bình luận.</p>';
-
-            }, 3000); // <-- Độ trễ 3 giây
+            setTimeout(() => {
+                formContainer.innerHTML = '<h2>Cảm ơn bạn đã gửi phản hồi!</h2><p>Chúng tôi sẽ liên hệ lại sớm nhất có thể.</p>';
+            }, 2500); // <-- Độ trễ 2.5 giây
         });
     </script>
 </body>
